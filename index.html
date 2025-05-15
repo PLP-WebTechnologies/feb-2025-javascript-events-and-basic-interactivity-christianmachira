@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Registration</title>
+    <style>
+        /* Global Styles */
+        :root {
+            --primary: #5b6efd;
+            --primary-dark: #3f51f5;
+            --secondary: #ff7d6e;
+            --text: #333;
+            --light-bg: #f5f7ff;
+            --white: #ffffff;
+            --gray: #e1e5f2;
+            --border-radius: 8px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--light-bg);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--white);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid var(--gray);
+        }
+        
+        header h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+        
+        header p {
+            color: var(--text);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Tab System */
+        .tab-container {
+            margin-bottom: 30px;
+        }
+        
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .tab-btn {
+            background-color: var(--gray);
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .tab-btn:hover {
+            background-color: #d0d6e9;
+        }
+        
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid var(--gray);
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+        
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(91, 110, 253, 0.2);
+        }
+        
+        .input-with-feedback {
+            position: relative;
+        }
+        
+        .validation-message {
+            font-size: 0.85rem;
+            margin-top: 5px;
+            min-height: 20px;
+            color: #e74c3c;
+        }
+        
+        input.valid {
+            border-color: #2ecc71;
+        }
+        
+        input.invalid {
+            border-color: #e74c3c;
+        }
+        
+        .submit-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: block;
+            margin-top: 30px;
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        /* Gallery Styles */
+        .gallery {
+            margin-top: 30px;
+        }
+        
+        .gallery-container {
+            position: relative;
+            height: 400px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .gallery-slide {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #000;
+        }
+        
+        .gallery-slide.active {
+            opacity: 1;
+        }
+        
+        .gallery-slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        
+        .gallery-caption {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            text-align: center;
+        }
+        
+        .gallery-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .gallery-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .gallery-btn:hover {
+            background-color: var(--primary-dark);
+            transform: scale(1.1);
+        }
+        
+        /* Accordion Styles */
+        .accordion {
+            margin-top: 30px;
+        }
+        
+        .accordion-item {
+            border: 1px solid var(--gray);
+            border-radius: var(--border-radius);
+            margin-bottom: 10px;
+            overflow: hidden;
+        }
+        
+        .accordion-header {
+            background-color: var(--white);
+            padding: 15px 20px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .accordion-header:hover {
+            background-color: var(--light-bg);
+        }
+        
+        .accordion-header h3 {
+            margin: 0;
+            font-size: 1.1rem;
+        }
+        
+        .accordion-icon {
+            transition: var(--transition);
+        }
+        
+        .accordion-item.active .accordion-icon {
+            transform: rotate(180deg);
+        }
+        
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background-color: var(--white);
+        }
+        
+        .accordion-item.active .accordion-content {
+            max-height: 300px;
+        }
+        
+        .accordion-body {
+            padding: 20px;
+        }
+        
+        /* Secret Feature */
+        .secret-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            color: white;
+            text-align: center;
+        }
+        
+        .secret-panel.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .secret-panel h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        .secret-panel p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin-bottom: 30px;
+        }
+        
+        .close-secret {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        
+        .close-secret:hover {
+            background-color: #ff5a47;
+            transform: scale(1.05);
+        }
+        
+        /* Notification */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary);
+            color: white;
+            padding: 15px 25px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .notification.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        /* Dark mode toggle */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--text);
+            color: var(--white);
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+        
+        .dark-mode-toggle:hover {
+            transform: rotate(45deg);
+        }
+        
+        /* Dark mode styles */
+        body.dark-mode {
+            --primary: #8c96ff;
+            --primary-dark: #7a86ff;
+            --text: #e1e1e1;
+            --light-bg: #1a1a1a;
+            --white: #2a2a2a;
+            --gray: #3a3a3a;
+        }
+        
+        body.dark-mode .tab-btn {
+            background-color: #3a3a3a;
+            color: #e1e1e1;
+        }
+        
+        body.dark-mode .tab-btn:hover {
+            background-color: #4a4a4a;
+        }
+        
+        body.dark-mode .dark-mode-toggle {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        /* Responsive styles */
+        @media (max-width: 768px) {
+            .tab-buttons {
+                flex-direction: column;
+            }
+            
+            .gallery-container {
+                height: 300px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <button class="dark-mode-toggle" id="darkModeToggle">🌙</button>
+    
+    <div class="container">
+        <header>
+            <h1>Tech Conference 2025</h1>
+            <p>Join us for the most exciting tech event of the year! Register now to secure your spot.</p>
+        </header>
+        
+        <div class="tab-container">
+            <div class="tab-buttons">
+                <button class="tab-btn active" data-tab="registration">Registration</button>
+                <button class="tab-btn" data-tab="gallery">Event Gallery</button>
+                <button class="tab-btn" data-tab="faq">FAQ</button>
+            </div>
+            
+            <div class="tab-content active" id="registration">
+                <h2>Register for the Event</h2>
+                <form id="registrationForm">
+                    <div class="form-group">
+                        <label for="fullName">Full Name *</label>
+                        <div class="input-with-feedback">
+                            <input type="text" id="fullName" required>
+                            <div class="validation-message"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="email">Email Address *</label>
+                        <div class="input-with-feedback">
+                            <input type="email" id="email" required>
+                            <div class="validation-message"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Create Password *</label>
+                        <div class="input-with-feedback">
+                            <input type="password" id="password" required>
+                            <div class="validation-message"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ticketType">Ticket Type *</label>
+                        <select id="ticketType" required>
+                            <option value="">-- Select Ticket Type --</option>
+                            <option value="standard">Standard ($199)</option>
+                            <option value="premium">Premium ($349)</option>
+                            <option value="vip">VIP ($599)</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="submitButton">Register Now</button>
+                </form>
+            </div>
+            
+            <div class="tab-content" id="gallery">
+                <h2>Event Highlights</h2>
+                <p>Check out some moments from our previous events:</p>
+                
+                <div class="gallery">
+                    <div class="gallery-container">
+                        <div class="gallery-slide active">
+                            <img src="/api/placeholder/800/500" alt="Conference Main Hall">
+                            <div class="gallery-caption">The main conference hall packed with attendees</div>
+                        </div>
+                        <div class="gallery-slide">
+                            <img src="/api/placeholder/800/500" alt="Keynote Speaker">
+                            <div class="gallery-caption">Our keynote speaker sharing insights on AI</div>
+                        </div>
+                        <div class="gallery-slide">
+                            <img src="/api/placeholder/800/500" alt="Workshop Session">
+                            <div class="gallery-caption">Interactive workshop sessions</div>
+                        </div>
+                        <div class="gallery-slide">
+                            <img src="/api/placeholder/800/500" alt="Networking Event">
+                            <div class="gallery-caption">Evening networking reception</div>
+                        </div>
+                    </div>
+                    
+                    <div class="gallery-controls">
+                        <button class="gallery-btn" id="prevSlide">←</button>
+                        <button class="gallery-btn" id="nextSlide">→</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tab-content" id="faq">
+                <h2>Frequently Asked Questions</h2>
+                
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3>What's included in the ticket price?</h3>
+                            <div class="accordion-icon">↓</div>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p>All tickets include access to the main conference talks, lunch and refreshments, and networking events. Premium tickets add workshop access, while VIP tickets include exclusive sessions with speakers and premium seating.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3>Can I get a refund if I'm unable to attend?</h3>
+                            <div class="accordion-icon">↓</div>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p>We offer full refunds up to 30 days before the event. Between 30 and 14 days, you can receive a 50% refund. No refunds are available within 14 days of the event, but you can transfer your ticket to someone else.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3>Where is the event located?</h3>
+                            <div class="accordion-icon">↓</div>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p>The Tech Conference 2025 will be held at the Grand Convention Center, located at 123 Innovation Boulevard, Tech City. The venue is easily accessible by public transportation and has ample parking available.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            <h3>Will the presentations be recorded?</h3>
+                            <div class="accordion-icon">↓</div>
+                        </div>
+                        <div class="accordion-content">
+                            <div class="accordion-body">
+                                <p>Yes, all main stage presentations will be recorded and made available to attendees within one week after the event. Workshop sessions will not be recorded to encourage open discussion and participation.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="notification" id="notification">
+        Form submitted successfully!
+    </div>
+    
+    <div class="secret-panel" id="secretPanel">
+        <h2>🎉 You found the secret! 🎉</h2>
+        <p>As a reward for your curiosity, use code <strong>DOUBLE25</strong> at checkout for an additional 25% off your ticket!</p>
+        <button class="close-secret" id="closeSecret">Got it!</button>
+    </div>
+    
+    <script>
+        // DOM Elements
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const registrationForm = document.getElementById('registrationForm');
+        const fullNameInput = document.getElementById('fullName');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const submitButton = document.getElementById('submitButton');
+        const notification = document.getElementById('notification');
+        const accordionItems = document.querySelectorAll('.accordion-item');
+        const prevSlideBtn = document.getElementById('prevSlide');
+        const nextSlideBtn = document.getElementById('nextSlide');
+        const slides = document.querySelectorAll('.gallery-slide');
+        const secretPanel = document.getElementById('secretPanel');
+        const closeSecretBtn = document.getElementById('closeSecret');
+        
+        // Variables
+        let currentSlide = 0;
+        let buttonClicks = 0;
+        let lastClickTime = 0;
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab System
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.getAttribute('data-tab');
+                    
+                    // Update active button
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    
+                    // Show selected tab
+                    tabContents.forEach(content => {
+                        content.classList.remove('active');
+                        if (content.id === tabId) {
+                            content.classList.add('active');
+                        }
+                    });
+                });
+            });
+            
+            // Form Validation
+            fullNameInput.addEventListener('input', validateName);
+            emailInput.addEventListener('input', validateEmail);
+            passwordInput.addEventListener('input', validatePassword);
+            
+            registrationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (validateForm()) {
+                    showNotification('Registration successful! Check your email for confirmation.');
+                    registrationForm.reset();
+                    
+                    // Reset validation styling
+                    document.querySelectorAll('input').forEach(input => {
+                        input.classList.remove('valid');
+                    });
+                    document.querySelectorAll('.validation-message').forEach(msg => {
+                        msg.textContent = '';
+                    });
+                }
+            });
+            
+            // Accordion
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                header.addEventListener('click', () => {
+                    item.classList.toggle('active');
+                });
+            });
+            
+            // Image Gallery
+            prevSlideBtn.addEventListener('click', () => {
+                showSlide(currentSlide - 1);
+            });
+            
+            nextSlideBtn.addEventListener('click', () => {
+                showSlide(currentSlide + 1);
+            });
+            
+            // Dark Mode Toggle
+            darkModeToggle.addEventListener('click', toggleDarkMode);
+            
+            // Secret Feature - Double Click on Submit Button
+            submitButton.addEventListener('click', function(e) {
+                const now = new Date().getTime();
+                const timeDiff = now - lastClickTime;
+                
+                if (timeDiff < 300) { // Double click detected
+                    e.preventDefault();
+                    secretPanel.classList.add('active');
+                }
+                
+                lastClickTime = now;
+            });
+            
+            // Close Secret Panel
+            closeSecretBtn.addEventListener('click', () => {
+                secretPanel.classList.remove('active');
+            });
+            
+            // Keyboard Navigation
+            document.addEventListener('keydown', function(e) {
+                // Arrow keys for gallery navigation
+                if (document.getElementById('gallery').classList.contains('active')) {
+                    if (e.key === 'ArrowLeft') {
+                        showSlide(currentSlide - 1);
+                    } else if (e.key === 'ArrowRight') {
+                        showSlide(currentSlide + 1);
+                    }
+                }
+                
+                // Easter egg - press 'K' key
+                if (e.key === 'k' || e.key === 'K') {
+                    document.body.classList.toggle('dark-mode');
+                    darkModeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+                }
+            });
+            
+            // Initialize the first slide
+            showSlide(0);
+        });
+        
+        // Functions
+        function validateName() {
+            const nameValue = fullNameInput.value.trim();
+            const nameMessage = fullNameInput.nextElementSibling;
+            
+            if (nameValue === '') {
+                setInvalid(fullNameInput, nameMessage, 'Name is required');
+                return false;
+            } else if (nameValue.length < 3) {
+                setInvalid(fullNameInput, nameMessage, 'Name must be at least 3 characters');
+                return false;
+            } else {
+                setValid(fullNameInput, nameMessage, '');
+                return true;
+            }
+        }
+        
+        function validateEmail() {
+            const emailValue = emailInput.value.trim();
+            const emailMessage = emailInput.nextElementSibling;
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            if (emailValue === '') {
+                setInvalid(emailInput, emailMessage, 'Email is required');
+                return false;
+            } else if (!emailRegex.test(emailValue)) {
+                setInvalid(emailInput, emailMessage, 'Please enter a valid email address');
+                return false;
+            } else {
+                setValid(emailInput, emailMessage, '');
+                return true;
+            }
+        }
+        
+        function validatePassword() {
+            const passwordValue = passwordInput.value;
+            const passwordMessage = passwordInput.nextElementSibling;
+            
+            if (passwordValue === '') {
+                setInvalid(passwordInput, passwordMessage, 'Password is required');
+                return false;
+            } else if (passwordValue.length < 8) {
+                setInvalid(passwordInput, passwordMessage, 'Password must be at least 8 characters');
+                return false;
+            } else if (!/[A-Z]/.test(passwordValue)) {
+                setInvalid(passwordInput, passwordMessage, 'Password must contain at least one uppercase letter');
+                return false;
+            } else if (!/[0-9]/.test(passwordValue)) {
+                setInvalid(passwordInput, passwordMessage, 'Password must contain at least one number');
+                return false;
+            } else {
+                setValid(passwordInput, passwordMessage, '');
+                return true;
+            }
+        }
+        
+        function setInvalid(input, messageElement, message) {
+            input.classList.add('invalid');
+            input.classList.remove('valid');
+            messageElement.textContent = message;
+        }
+        
+        function setValid(input, messageElement, message) {
+            input.classList.remove('invalid');
+            input.classList.add('valid');
+            messageElement.textContent = message;
+        }
+        
+        function validateForm() {
+            const nameValid = validateName();
+            const emailValid = validateEmail();
+            const passwordValid = validatePassword();
+            
+            return nameValid && emailValid && passwordValid;
+        }
+        
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            
+            currentSlide = (n + slides.length) % slides.length;
+            slides[currentSlide].classList.add('active');
+        }
+        
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            darkModeToggle.textContent = document.body.classList.contains('dark-mode') ? '☀️' : '🌙';
+        }
+    </script>
+</body>
+</html>
